@@ -10,4 +10,4 @@ on:
 jobs:
   succeed:
     steps:
-      - run: echo 'Success!'
+      - run: echo "Success!"

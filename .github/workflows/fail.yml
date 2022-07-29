@@ -11,5 +11,5 @@ jobs:
   fail:
     steps:
       - run: |
-        echo 'Failure!'
+        echo "Failure!"
         exit 1
