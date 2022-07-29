@@ -9,6 +9,7 @@ on:
 
 jobs:
   fail:
+    runs-on: ubuntu-latest
     steps:
       - run: |
           echo "Failure!"
