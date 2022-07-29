@@ -1,0 +1,47 @@
+name: "Backmerge branches"
+
+on: [status]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  backmerge:
+    runs-on: ubuntu-latest
+    if: github.ref_protected && github.event.state == 'success'
+    steps:
+      - id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.ABURGELOID_BOT_APP_ID }}
+          private_key: ${{ secrets.ABURGELOID_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ steps.generate_token.outputs.token }}
+
+      - id: target_branch
+        run: |
+          case "${{ github.ref_name }}" in
+            main)
+              echo "::set-output name=branch_name::staging"
+              ;;
+            staging)
+              echo "::set-output name=branch_name::develop"
+              ;;
+            *)
+              exit 0
+              ;;
+          esac
+
+      - name: Backmerge
+        if: steps.target_branch.outputs.branch_name
+        run: |
+          git config user.name "aburgeloid[bot]"
+          git config user.email "110211630+aburgeloid[bot]@users.noreply.github.com"
+
+          git checkout ${{ steps.target_branch.outputs.branch_name }}
+          git merge ${{ github.ref_name }} --no-ff
+
+          git push
