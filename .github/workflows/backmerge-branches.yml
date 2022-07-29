@@ -1,6 +1,10 @@
 name: "Backmerge branches"
 
-on: [status]
+on:
+  workflow_run:
+    workflows: ["Always succeed"]
+    types:
+      - completed
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -8,7 +12,7 @@ concurrency:
 jobs:
   backmerge:
     runs-on: ubuntu-latest
-    if: github.ref_protected && github.event.state == 'success'
+    if: github.ref_protected && github.event.workflow_run.conclusion == 'success'
     steps:
       - id: generate_token
         uses: tibdex/github-app-token@v1
