@@ -16,10 +16,10 @@ jobs:
         with:
           github-token: ${{ steps.generate_token.outputs.token }}
           script: |
-          github.rest.repos.createOrUpdateFileContents({
-            context.repo.owner,
-            context.repo.owner,
-            'test.txt',
-            'bot commit',
-            'dGVzdGluZyAxMjM0Cg=='
-          })
+            github.rest.repos.createOrUpdateFileContents({
+              context.repo.owner,
+              context.repo.owner,
+              'test.txt',
+              'bot commit',
+              'dGVzdGluZyAxMjM0Cg=='
+            })
