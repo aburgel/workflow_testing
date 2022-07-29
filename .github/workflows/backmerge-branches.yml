@@ -1,0 +1,57 @@
+name: "Backmerge branches"
+
+on:
+  workflow_run:
+    workflows: ["Always succeed"]
+    types:
+      - completed
+    branches:
+      - main
+      - staging
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch }}
+
+jobs:
+  backmerge:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - run: echo "${{ toJSON(github) }}"
+
+      - id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.ABURGELOID_BOT_APP_ID }}
+          private_key: ${{ secrets.ABURGELOID_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_branch }}
+          token: ${{ steps.generate_token.outputs.token }}
+
+      - id: target_branch
+        run: |
+          case "${{ github.event.workflow_run.head_branch }}" in
+            main)
+              echo "::set-output name=branch_name::staging"
+              ;;
+            staging)
+              echo "::set-output name=branch_name::develop"
+              ;;
+            *)
+              exit 0
+              ;;
+          esac
+
+      - name: Backmerge
+        if: steps.target_branch.outputs.branch_name
+        run: |
+          git config user.name "aburgeloid[bot]"
+          git config user.email "110211630+aburgeloid[bot]@users.noreply.github.com"
+
+          git checkout ${{ steps.target_branch.outputs.branch_name }}
+          git merge ${{ github.event.workflow_run.head_branch }} --no-ff
+
+          git push

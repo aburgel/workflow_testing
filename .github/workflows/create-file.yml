@@ -12,13 +12,14 @@ jobs:
           app_id: ${{ secrets.ABURGELOID_BOT_APP_ID }}
           private_key: ${{ secrets.ABURGELOID_BOT_PRIVATE_KEY }}
 
-      - uses: octokit/request-action@v2.x
+      - uses: actions/github-script@v6
         with:
-          route: POST /repos/{owner}/{repo}/contents/{path}
-          owner: aburgel
-          repo: workflow_testing
-          path: test.txt
-          message: bot commit
-          content: dGVzdGluZyAxMjM0Cg==
-        env:
-          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+          github-token: ${{ steps.generate_token.outputs.token }}
+          script: |
+            github.rest.repos.createOrUpdateFileContents({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: 'test.txt',
+              message: 'bot commit',
+              content: 'dGVzdGluZyAxMjM0Cg=='
+            })
