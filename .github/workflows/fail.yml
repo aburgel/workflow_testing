@@ -1,0 +1,15 @@
+name: Always fail
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - master
+
+jobs:
+  fail:
+    steps:
+      - run: |
+        echo 'Failure!'
+        exit 1

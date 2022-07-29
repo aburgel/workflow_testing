@@ -1,0 +1,13 @@
+name: Always succeed
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - master
+
+jobs:
+  succeed:
+    steps:
+      - run: echo 'Success!'
