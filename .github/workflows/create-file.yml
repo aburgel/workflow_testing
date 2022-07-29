@@ -17,9 +17,9 @@ jobs:
           github-token: ${{ steps.generate_token.outputs.token }}
           script: |
             github.rest.repos.createOrUpdateFileContents({
-              context.repo.owner,
-              context.repo.owner,
-              'test.txt',
-              'bot commit',
-              'dGVzdGluZyAxMjM0Cg=='
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: 'test.txt',
+              message: 'bot commit',
+              content: 'dGVzdGluZyAxMjM0Cg=='
             })
