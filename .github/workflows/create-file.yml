@@ -1,0 +1,25 @@
+name: "Create file"
+
+on: [workflow_dispatch]
+
+jobs:
+  create-file:
+    runs-on: ubuntu-latest
+    steps:
+      - id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.ABURGELOID_BOT_APP_ID }}
+          private_key: ${{ secrets.ABURGELOID_BOT_PRIVATE_KEY }}
+
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ steps.generate_token.outputs.token }}
+          script: |
+            github.rest.repos.createOrUpdateFileContents({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              path: 'test.txt',
+              message: 'bot commit',
+              content: 'dGVzdGluZyAxMjM0Cg=='
+            })
